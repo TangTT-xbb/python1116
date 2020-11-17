@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-bbbbbbb
-=======
-this is the first code
->>>>>>> 
+import time

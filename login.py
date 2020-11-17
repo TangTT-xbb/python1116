@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-aaaa
-=======
-this is second code
->>>>>>> 
+import os
