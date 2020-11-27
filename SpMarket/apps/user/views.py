@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from db.base_view import VerifyLoginView
-from user.forms import RegisterModelForm, LoginModelForm
+from user.forms import RegisterModelForm, LoginModelForm, ForgetpwdModelForm
 from user.helper import set_password, set_session, check_login
 from user.models import SpUser
 
@@ -71,13 +71,32 @@ class LoginView(View):
 class MemberView(VerifyLoginView):
     """个人中心"""
 
-    def get(self,request):
-        return render(request,'user/member.html')
-
+    def get(self, request):
+        return render(request, 'user/member.html')
 
     def post(self):
         return HttpResponse("hi")
 
 
+class ForgetpwdView(View):
+    def get(self, request):
+        return render(request,'user/forgetpassword.html')
 
+    def post(self, request):
+        # 接收数据
+        data = request.POST
+        # 验证数据合法性
+        forgetpwd_form = ForgetpwdModelForm(data)
+        if forgetpwd_form.is_valid():
+            # 操作数据库
+            # 更新密码到数据库
 
+            # 跳转到登录
+            return redirect('user:登录')
+
+        # 合成响应
+        context={
+
+            'form': forgetpwd_form
+        }
+        return render(request, 'user/forgetpassword.html',context=context)

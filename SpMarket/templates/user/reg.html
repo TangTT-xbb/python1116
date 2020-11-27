@@ -6,7 +6,7 @@
     注册
 {% endblock %}
 {% block content %}
-    <form action="" method="post">
+    <form action="" method="post" autocomplete="off">
         {% csrf_token %}
         <input type="text" name="phone" placeholder="请输入手机号" class="login-name">
         <a class="am-u-sm-offset-1 am-text-danger ">{{ form.errors.phone.0 }}</a>
