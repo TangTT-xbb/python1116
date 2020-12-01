@@ -83,6 +83,7 @@ class LoginModelForm(forms.ModelForm):
         self.cleaned_data['user'] = user
         return self.cleaned_data
 
+
 class ForgetpwdModelForm(forms.ModelForm):
     password = forms.CharField(max_length=16,
                                min_length=6,
@@ -107,17 +108,54 @@ class ForgetpwdModelForm(forms.ModelForm):
     def clean(self):
         # 验证两个密码是否一样
         phone = self.cleaned_data.get('phone')
-        if re.match(r'^1[3-9]\d{9}$',str(phone)):
+        if re.match(r'^1[3-9]\d{9}$', str(phone)):
             try:
                 phone == SpUser.objects.filter(phone=phone)
             except SpUser.DoesNotExist:
                 raise forms.ValidationError({"phone": '手机号码填写错误'})
 
         else:
-            raise forms.ValidationError({"phone":"手机号码非法"})
+            raise forms.ValidationError({"phone": "手机号码非法"})
         pwd1 = self.cleaned_data.get('password')
         pwd2 = self.cleaned_data.get('re_password')
         if pwd1 and pwd2 and pwd1 != pwd2:
             # 确认密码错误
             raise forms.ValidationError({"re_password": "两次密码输入不一致"})
+        return self.cleaned_data
+
+
+class UpdatepwdModelForm(forms.ModelForm):
+    old_password = forms.CharField(error_messages={'required': "原密码必填"})
+    password = forms.CharField(max_length=16,
+                               min_length=6,
+                               error_messages={
+                                   'required': "新密码必填",
+                                   'max_length': "密码长度不能大于16个字符",
+                                   'min_length': "密码长度不能小于6个字符",
+                               }
+                               )
+    re_password = forms.CharField(error_messages={'required': "确认密码必填"})
+
+
+    class Meta:
+        model = SpUser
+        # 需要验证的字段
+        fields = ['password', ]
+        error_messages = {
+            "password": {'required': "请填写密码"},
+        }
+
+    def clean(self):
+        old_password = self.cleaned_data.get('old_password')
+        old_password = set_password(old_password)
+        try:
+            old_password == SpUser.objects.filter(password=old_password)
+        except SpUser.DoesNotExist:
+            raise forms.ValidationError({"old_password": '密码输入错误'})
+        pwd1 = self.cleaned_data.get('password')
+        pwd2 = self.cleaned_data.get('re_password')
+        if pwd1 and pwd2 and pwd1 != pwd2:
+            # 确认密码错误
+            raise forms.ValidationError({"re_password": "两次密码输入不一致"})
+
         return self.cleaned_data
