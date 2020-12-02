@@ -1,4 +1,7 @@
-from django.http import HttpResponse
+import random
+import re
+
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -108,7 +111,7 @@ class ForgetpwdView(View):
             'form': forgetpwd_form
         }
         return render(request, 'user/forgetpassword.html', context=context)
- 
+
 
 class UpdatepwdView(VerifyLoginView):
     def get(self, request):
@@ -150,3 +153,26 @@ def saftystep(request):
 
 # 验证码随机
 # i = [random.randint(0,9) for _ in range(6)]
+
+class SendMsg(View):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        # 接收数据
+        phone = request.POST.get("phone", '')
+        rs = re.search('^1[3-9]\d{9}$', phone)
+        if rs is None:
+            return JsonResponse({'error': 1, 'errorMsg': '手机号码格式错误！'})
+        # 处理数据
+        """
+        1. 生成随机验证码
+        2. 
+        3. 接入运营商
+        
+        
+        """
+        random_code = "".join([str(random.randint(0, 9)) for _ in range(6)])
+
+        # 合成响应
+        return JsonResponse({'error': 0})
