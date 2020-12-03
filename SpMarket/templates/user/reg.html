@@ -15,9 +15,11 @@
         <input type="password" name="re_password" placeholder="确认密码" class="login-name">
         <a class="am-u-sm-offset-1 am-text-danger ">{{ form.errors.re_password.0 }}</a>
         <div class="yzm" style="margin-top: 1.5rem;">
-            <input type="text" class="reg-yzm" placeholder="输入验证码"/>
+            <input type="text" class="reg-yzm" name="verify_code" placeholder="输入验证码"/>
+
             <input type="button" class="yzm-hq" value="获取验证码"/>
         </div>
+        <a class="am-u-sm-offset-1 am-text-danger ">{{ form.errors.verify_code.0 }}</a>
         <input type="submit" class="login-btn" value="立即注册">
         <div class="agree">
             <input type="checkbox" name="checkbox" value="同意" checked="">&nbsp;同意
@@ -54,12 +56,39 @@
                     dataType: 'json',
                     success: function (data) {
                         //4. 判断是否发送成功
-                        if (data.error == 1) {
+                        if (data.error == 0) {
                             //成功
-                            //按钮变灰
-                            $(self).css("background-color","gray");
-                        }
+                            //1. 按钮变灰
+                            $(self).css("background-color", "gray");
+                            //2. 按钮不能再点击
+                            $(self).attr('disabled', 'disabled');
+                            {#$(self).prop('disabled',true);#}
+                            //3. 开始倒计时 周期性执行函数
+                            var time = 3;
+                            var msg = time + '秒后重新发送';
+                            var timer = window.setInterval(function () {
+                                    --time;
+                                    if (time == 0) {
+                                        //1. 按钮变灰
+                                        $(self).css("background-color", "#76bb2a");
+                                        //2. 按钮不能再点击
+                                        $(self).prop('disabled', false);
+                                        //3. 文字修正
+                                        $(self).val("获取验证码");
+                                        //4. 清除定时
+                                        window.clearInterval(timer);
+                                        //5. 返回
+                                        return;
+                                    }
+                                    msg = time + '秒后重新发送';
+                                    $(self).val(msg);
+                                }, 1000
+                            );
 
+
+                        } else {
+                            alert('短信验证码发送失败')
+                        }
 
 
                     }

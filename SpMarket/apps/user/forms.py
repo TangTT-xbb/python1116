@@ -20,7 +20,7 @@ class RegisterModelForm(forms.ModelForm):
 
     re_password = forms.CharField(error_messages={'required': "密码必填"})
 
-    # verify_code = forms.CharField(error_messages={'required': "验证码必填"})
+    verify_code = forms.CharField(error_messages={'required': "验证码必填"})
 
     class Meta:
         model = SpUser
@@ -47,7 +47,15 @@ class RegisterModelForm(forms.ModelForm):
         if pwd1 and pwd2 and pwd1 != pwd2:
             # 确认密码错误
             raise forms.ValidationError({"re_password": "两次密码输入不一致"})
+        # 这个号码必须和发送给用户的号码一致 ？？？？
+        verify_code = self.cleaned_data.get('verify_code',"")
+
+        rs = re.search('^[0-9]\d{5}$',verify_code)
+        if rs is None:
+            raise forms.ValidationError({"verify_code":"验证码输入错误"})
+
         return self.cleaned_data
+
 
 
 class LoginModelForm(forms.ModelForm):

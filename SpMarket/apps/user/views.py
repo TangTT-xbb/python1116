@@ -12,6 +12,7 @@ from db.base_view import VerifyLoginView
 from user.forms import RegisterModelForm, LoginModelForm, ForgetpwdModelForm, UpdatepwdModelForm
 from user.helper import set_password, set_session, check_login
 from user.models import SpUser
+from django_redis import get_redis_connection
 
 
 class RegisterView(View):
@@ -167,12 +168,24 @@ class SendMsg(View):
         # 处理数据
         """
         1. 生成随机验证码
-        2. 
-        3. 接入运营商
-        
-        
+        2. 保存发送的验证码用于注册的表单验证
+        3. 接入运营商    
         """
         random_code = "".join([str(random.randint(0, 9)) for _ in range(6)])
+        print("=========随机验证码为：{}============".format(random_code))
+        # 接入运营商
+        # 保存发送的验证码到redis
+
+        r = get_redis_connection()
+        r.set(phone, random_code)
+        # 保存手机号码发送的次数
+        key_times = "{}_times".format(phone)
+        now_times = r.get(key_times)
+        if now_times is None or now_times < 5:
+            r.incr(key_times)
+        else:
+            # 返回并告知用户发送次数过多
+            return JsonResponse({'error':1,"errorMsg":"验证码发送次数过多"})
 
         # 合成响应
         return JsonResponse({'error': 0})
