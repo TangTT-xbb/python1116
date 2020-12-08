@@ -22,10 +22,11 @@
         <a class="am-u-sm-offset-1 am-text-danger ">{{ form.errors.verify_code.0 }}</a>
         <input type="submit" class="login-btn" value="立即注册">
         <div class="agree">
-            <input type="checkbox" name="checkbox" value="同意" checked="">&nbsp;同意
+            <input type="checkbox" name="agree" value="同意" checked="">&nbsp;同意
             <a href="" class="xy">《用户协议》</a>
             <div class="r-login">已有账号，请<a href="login.html" class="l-login">登录</a></div>
         </div>
+        <a class="am-u-sm-offset-1 am-text-danger ">{{ form.errors.agree.0 }}</a>
     </form>
 
 {% endblock %}
@@ -87,7 +88,7 @@
 
 
                         } else {
-                            alert('短信验证码发送失败')
+                            alert(data.errorMsg)
                         }
 
 

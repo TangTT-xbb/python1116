@@ -175,14 +175,20 @@ class SendMsg(View):
         print("=========随机验证码为：{}============".format(random_code))
         # 接入运营商
         # 保存发送的验证码到redis
-
+        # 获取连接
         r = get_redis_connection()
+        # 保存手机号码对应的验证码
         r.set(phone, random_code)
+        # 设置过期时间
+        r.expire(phone,60)
         # 保存手机号码发送的次数
         key_times = "{}_times".format(phone)
-        now_times = r.get(key_times)
-        if now_times is None or now_times < 5:
+        now_times = r.get(key_times)   # 从redis获取的二进制，需要转换
+        if now_times is None or int(now_times) < 5:
             r.incr(key_times)
+            # 设置一个过期时间
+            r.expire(key_times, 360)
+
         else:
             # 返回并告知用户发送次数过多
             return JsonResponse({'error':1,"errorMsg":"验证码发送次数过多"})

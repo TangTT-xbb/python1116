@@ -4,6 +4,7 @@ from django import forms
 
 from user.helper import set_password
 from user.models import SpUser
+from django_redis import get_redis_connection
 
 
 class RegisterModelForm(forms.ModelForm):
@@ -20,7 +21,10 @@ class RegisterModelForm(forms.ModelForm):
 
     re_password = forms.CharField(error_messages={'required': "密码必填"})
 
-    verify_code = forms.CharField(error_messages={'required': "验证码必填"})
+    verify_code = forms.CharField(error_messages={'required': "验证码必填",
+                                                  r'^[0-9]\d{5}$': '请填写正确的手机号码'})
+
+    agree = forms.BooleanField(required=True, error_messages={'required': "请同意用户协议"})
 
     class Meta:
         model = SpUser
@@ -48,11 +52,26 @@ class RegisterModelForm(forms.ModelForm):
             # 确认密码错误
             raise forms.ValidationError({"re_password": "两次密码输入不一致"})
         # 这个号码必须和发送给用户的号码一致 ？？？？
-        verify_code = self.cleaned_data.get('verify_code',"")
 
-        rs = re.search('^[0-9]\d{5}$',verify_code)
-        if rs is None:
-            raise forms.ValidationError({"verify_code":"验证码输入错误"})
+        try:
+            verify_code = self.cleaned_data.get('verify_code', "")
+            phone = self.cleaned_data.get('phone', 'phone')
+            r = get_redis_connection()
+            re_verify_code = r.get(phone)
+            re_verify_code = re_verify_code.decode('utf-8')  # 把二进制转换为str
+            if verify_code and verify_code != str(re_verify_code):
+                raise forms.ValidationError({"verify_code": "验证码输入错误"})
+        except:
+            raise forms.ValidationError({"verify_code": "验证码输入错误"})
+
+        """or ( 注释部分暂未发现bug)
+                verify_code = self.cleaned_data.get('verify_code', "")
+                phone = self.cleaned_data.get('phone', 'phone')
+                r = get_redis_connection()
+                re_verify_code = r.get(phone)
+                re_verify_code = re_verify_code.decode('utf-8')  # 把二进制转换为str
+                if verify_code and verify_code != str(re_verify_code):
+                    raise forms.ValidationError({"verify_code": "验证码输入错误"})"""
 
         return self.cleaned_data
 
@@ -143,7 +162,6 @@ class UpdatepwdModelForm(forms.ModelForm):
                                }
                                )
     re_password = forms.CharField(error_messages={'required': "确认密码必填"})
-
 
     class Meta:
         model = SpUser
