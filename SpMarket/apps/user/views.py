@@ -1,5 +1,6 @@
 import random
 import re
+import uuid
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -10,7 +11,7 @@ from django.views import View
 
 from db.base_view import VerifyLoginView
 from user.forms import RegisterModelForm, LoginModelForm, ForgetpwdModelForm, UpdatepwdModelForm
-from user.helper import set_password, set_session, check_login
+from user.helper import set_password, set_session, check_login, send_sms
 from user.models import SpUser
 from django_redis import get_redis_connection
 
@@ -180,10 +181,10 @@ class SendMsg(View):
         # 保存手机号码对应的验证码
         r.set(phone, random_code)
         # 设置过期时间
-        r.expire(phone,60)
+        r.expire(phone, 60)
         # 保存手机号码发送的次数
         key_times = "{}_times".format(phone)
-        now_times = r.get(key_times)   # 从redis获取的二进制，需要转换
+        now_times = r.get(key_times)  # 从redis获取的二进制，需要转换
         if now_times is None or int(now_times) < 5:
             r.incr(key_times)
             # 设置一个过期时间
@@ -191,7 +192,17 @@ class SendMsg(View):
 
         else:
             # 返回并告知用户发送次数过多
-            return JsonResponse({'error':1,"errorMsg":"验证码发送次数过多"})
+            return JsonResponse({'error': 1, "errorMsg": "验证码发送次数过多"})
+
+        # >> > 3.
+        # 接入运营商
+        __business_id = uuid.uuid1()
+        params = "{\"code\":\"%s\"}" % random_code
+        print(params)
+
+        rs = send_sms(__business_id, phone, "唐红艳", "SMS_206538704", params)
+        # rs = send_sms(__business_id, 手机号码, "签名名称", "模板code", 传入参数)
+        print(rs.decode('utf-8'))
 
         # 合成响应
         return JsonResponse({'error': 0})
