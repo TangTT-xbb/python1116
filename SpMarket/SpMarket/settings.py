@@ -151,8 +151,3 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
-# 短信发送的key
-# ACCESS_KEY_ID = "LTAI2qSiJdWP87em"
-# ACCESS_KEY_SECRET = "FzORQ587PgGBoOAdmxzCjaxQi8klUi"
-ACCESS_KEY_ID = "LTAI4G6JHf6qefD93PzTqspG"
-ACCESS_KEY_SECRET = "AgaDTucjbxfTgTsLrj6j9skYnUvnVb"
