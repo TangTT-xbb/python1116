@@ -10,16 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
-
 import sys
-
 
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # TTT 添加的
-sys.path.insert(0,os.path.join(BASE_DIR,'apps'))
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -31,7 +29,6 @@ SECRET_KEY = 'ae^bcd#9v*au45wnl1axj8_f7m4+8^m$@&+39(vx0lb^og!$$i'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -73,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',# 添加渲染 MEDIA_URL 变量
             ],
         },
     },
@@ -80,17 +78,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SpMarket.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': { #sqlite3
+    'default': {  # sqlite3
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -110,13 +106,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 # LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'zh-hans'
-
 
 TIME_ZONE = 'UTC'
 
@@ -127,26 +121,24 @@ USE_L10N = True
 # USE_TZ = True
 USE_TZ = False
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'static')
+    os.path.join(BASE_DIR, 'static'),
 ]
-
 
 # 添加django中的缓存配置
 CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:6379/1", #redis启动起来，使用的1号数据库（0-15）
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # redis启动起来，使用的1号数据库（0-15）
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
+}
 # 修改默认 session的存储引擎
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -157,3 +149,12 @@ SESSION_CACHE_ALIAS = "default"
 
 ACCESS_KEY_ID = "LTAI4G6JHf6qefD93PzTqspG"
 ACCESS_KEY_SECRET = "AgaDTucjbxfTgTsLrj6j9skYnUvnVb"
+
+# 配置上传图片
+
+# MEDIA_URL = os.path.join(STATIC_URL, '/media/')
+MEDIA_URL = "/media/"      # 访问路径
+
+# 配置该url对应的物理目录存储地址
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')    # 上传路径
+# 获得上传文件的url地址,上传文件放在MEDIA_ROOT中,返回的地址前面加上MEDIA_URL.

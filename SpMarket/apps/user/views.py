@@ -77,6 +77,7 @@ class MemberView(VerifyLoginView):
     """个人中心"""
 
     def get(self, request):
+
         return render(request, 'user/member.html')
 
     def post(self):

@@ -17,6 +17,7 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css"/>
     <script src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
     <script src="{% static 'js/time.js' %}"></script>
+    <script src="{% static 'js/popup.mini.js' %}"></script>
     {% block head_css %}
         {#    写css      #}
     {% endblock %}
@@ -71,6 +72,16 @@
 {% block footer %}
 
 {% endblock %}
+<script type='text/javascript'>
+    (function () {
+        new PopUp_api({el: '.index-qd', html: '.qd-box'});
+    })()
+</script>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/amazeui.min.js' %}"></script>
+
+
 {% block footer_js %}
 
 {% endblock %}

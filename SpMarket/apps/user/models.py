@@ -48,7 +48,7 @@ class SpUser(BaseModel):
                                )
 
     # 设置头像字段
-    # head = models.ImageField(upload_to='head/%Y%m',default='head/memtx.png',verbose_name='用户头像')
+    head = models.ImageField(upload_to='head/%Y%m',default='head/memtx.png',verbose_name='用户头像')
 
     # 定义额外字段
     is_delete = models.BooleanField(default=False,verbose_name='是否删除')

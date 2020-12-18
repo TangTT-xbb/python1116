@@ -1,7 +1,7 @@
 import hashlib
 from django.shortcuts import redirect
 
-from SpMarket.settings import SECRET_KEY,ACCESS_KEY_ID, ACCESS_KEY_SECRET
+from SpMarket.settings import SECRET_KEY, ACCESS_KEY_ID, ACCESS_KEY_SECRET
 from aliyunsdkdysmsapi.request.v20170525 import SendSmsRequest
 from aliyunsdkcore.client import AcsClient
 
@@ -22,7 +22,7 @@ def set_password(password):
 def set_session(request, user):
     request.session['ID'] = user.pk
     request.session['phone'] = user.phone  # 使用session来保存用户登录信息
-    # request.session['head'] = user.head
+    request.session['head'] = user.head
     request.session.set_expiry(None)  # 两周
     # request.session.set_expiry(0)  # 关闭浏览器就消失
 
@@ -41,6 +41,7 @@ def check_login(func):  # 登录验证装饰器
     return verify_login
 
 
+# 发送短信
 REGION = "cn-hangzhou"
 PRODUCT_NAME = "Dysmsapi"
 DOMAIN = "dysmsapi.aliyuncs.com"
