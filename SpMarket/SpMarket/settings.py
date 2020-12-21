@@ -147,9 +147,11 @@ SESSION_CACHE_ALIAS = "default"
 # ACCESS_KEY_ID = "LTAI2qSiJdWP87em"
 # ACCESS_KEY_SECRET = "FzORQ587PgGBoOAdmxzCjaxQi8klUi"
 
+# 这部分需要阿里的AccessKey
+"""
 ACCESS_KEY_ID = "LTAI4G6JHf6qefD93PzTqspG"
 ACCESS_KEY_SECRET = "AgaDTucjbxfTgTsLrj6j9skYnUvnVb"
-
+"""
 # 配置上传图片
 
 # MEDIA_URL = os.path.join(STATIC_URL, '/media/')
