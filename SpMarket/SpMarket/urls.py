@@ -21,6 +21,8 @@ from SpMarket import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    # 添加第三方插件
+    
     # url(r'^cart/', include('cart.urls',namespace='cart')),
     url(r'^user/', include('user.urls', namespace='user')),
     # url(r'^order/', include('order.urls',namespace='order')),

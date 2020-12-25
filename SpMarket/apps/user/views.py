@@ -77,7 +77,6 @@ class MemberView(VerifyLoginView):
     """个人中心"""
 
     def get(self, request):
-
         return render(request, 'user/member.html')
 
     def post(self):
@@ -207,3 +206,33 @@ class SendMsg(View):
 
         # 合成响应
         return JsonResponse({'error': 0})
+
+
+class InfoView(VerifyLoginView):
+    def get(self, request):
+        # 获取用户session中的id
+        user_id = request.session.get('ID')
+        # 获取用户信息
+        user = SpUser.objects.get(pk=user_id)
+        # 渲染页面
+        context = {
+            'user': user,
+        }
+        return render(request, 'user/infor.html', context=context)
+
+    def post(self, request):
+        # 接收参数
+        data = request.POST
+        head = request.FILES.get('head')
+        user_id = request.session.get('ID')
+        user = SpUser.objects.get(pk=user_id)
+        user.nickname = data.get('nickname')
+        user.gender = data.get('gender')
+        if head is not None:
+            user.head = head
+        user.save()
+        # 操作数据库
+        # 修改session
+        set_session(request,user)
+        # 合成响应
+        return redirect('user:个人中心')

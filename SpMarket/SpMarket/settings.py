@@ -148,10 +148,9 @@ SESSION_CACHE_ALIAS = "default"
 # ACCESS_KEY_SECRET = "FzORQ587PgGBoOAdmxzCjaxQi8klUi"
 
 # 这部分需要阿里的AccessKey
-"""
-ACCESS_KEY_ID = "LTAI4G6JHf6qefD93PzTqspG"
-ACCESS_KEY_SECRET = "AgaDTucjbxfTgTsLrj6j9skYnUvnVb"
-"""
+ACCESS_KEY_ID = "NUll"
+ACCESS_KEY_SECRET = "NUll"
+
 # 配置上传图片
 
 # MEDIA_URL = os.path.join(STATIC_URL, '/media/')
@@ -161,5 +160,8 @@ MEDIA_URL = "/media/"  # 访问路径
 # MEDIA_ROOT = os.path.join(BASE_DIR, '/media/')    # 上传路径
 # 获得上传文件的url地址,上传文件放在MEDIA_ROOT中,返回的地址前面加上MEDIA_URL.
 
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')  # 设置静态文件路径为主目录下的media文件夹
+
+
+
+
