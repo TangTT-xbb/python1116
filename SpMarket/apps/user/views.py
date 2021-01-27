@@ -233,6 +233,9 @@ class InfoView(VerifyLoginView):
         user.save()
         # 操作数据库
         # 修改session
-        set_session(request,user)
+        set_session(request, user)
         # 合成响应
         return redirect('user:个人中心')
+
+
+
