@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'goods.apps.GoodsConfig',
     'order.apps.OrderConfig',
     'user.apps.UserConfig',
+    'ckeditor',  # 添加ckeditor富文本编辑器
+    'ckeditor_uploader',  # 添加ckeditor富文本编辑器文件上传部件
 ]
 
 MIDDLEWARE = [
@@ -125,9 +127,12 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATICFILES_DIRS为上线前需要删除的内容
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+# 设置静态文件根目录  上线的时候使用
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # 添加django中的缓存配置
 CACHES = {
@@ -162,6 +167,13 @@ MEDIA_URL = "/media/"  # 访问路径
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')  # 设置静态文件路径为主目录下的media文件夹
 
+# 富文本框
+# 设置ckeditor的上传目录
+CKEDITOR_UPLOAD_PATH = "uploads/"  # 这个目录是相对目录，相对与 MEDIA_ROOT
 
-
-
+# 编辑器样式配置
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+    },
+}

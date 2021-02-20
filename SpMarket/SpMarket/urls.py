@@ -20,11 +20,13 @@ from django.contrib import admin
 from SpMarket import settings
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    # 添加第三方插件
-    
-    # url(r'^cart/', include('cart.urls',namespace='cart')),
-    url(r'^user/', include('user.urls', namespace='user')),
-    # url(r'^order/', include('order.urls',namespace='order')),
-    url(r'^goods/', include('goods.urls',namespace='goods')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  url(r'^admin/', admin.site.urls),
+                  # 添加第三方插件
+
+                  # url(r'^cart/', include('cart.urls',namespace='cart')),
+                  url(r'^user/', include('user.urls', namespace='user')),
+                  # url(r'^order/', include('order.urls',namespace='order')),
+                  url(r'^goods/', include('goods.urls', namespace='goods')),
+                  # 上传部件自动调用的上传地址
+                  url(r'^ckeditor/', include("ckeditor_uploader.urls")),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
