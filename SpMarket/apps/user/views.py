@@ -66,9 +66,13 @@ class LoginView(View):
             user = login_form.cleaned_data["user"]
 
             set_session(request, user)
-
-            # 合成响应 跳转到个人中心
-            return redirect('user:个人中心')
+            referer = request.session.get('referer')
+            if referer:
+                # 跳转回去
+                return redirect(referer)
+            else:
+                # 合成响应 跳转到个人中心
+                return redirect('user:个人中心')
         else:
             return render(request, 'user/login.html', {'form': login_form})
 
@@ -236,6 +240,3 @@ class InfoView(VerifyLoginView):
         set_session(request, user)
         # 合成响应
         return redirect('user:个人中心')
-
-
-

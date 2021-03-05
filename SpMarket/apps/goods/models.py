@@ -41,16 +41,17 @@ class GoodsSPU(BaseModel):
 
 class Category(BaseModel):
     """商品分类表"""
-    classname = models.CharField(verbose_name='商品分类名',
+    cate_name = models.CharField(verbose_name='商品分类名',
                                  max_length=20)
     brief = RichTextUploadingField(verbose_name="商品分类简介")
+    order = models.SmallIntegerField(default=0, verbose_name="排序")
 
     def __str__(self):
-        return self.classname
+        return self.cate_name
 
     class Meta:
         db_table = "Category"
-        verbose_name = "商品分类表"
+        verbose_name = "商品分类管理"
         verbose_name_plural = verbose_name
 
 
@@ -79,7 +80,7 @@ class GoodsSKU(BaseModel):
 
     unit = models.ForeignKey(to="Unit", on_delete=models.DO_NOTHING, verbose_name='商品单位')
     stock = models.IntegerField(verbose_name='库存', default=0)
-    sales = models.IntegerField(verbose_name='销量', default=0)
+    sale_num = models.IntegerField(verbose_name='销量', default=0)
     # logo_url = models.URLField(verbose_name='logo地址')
     # 默认相册中的第一张图片作为封面照片
     logo = models.ImageField(verbose_name='封面照片',

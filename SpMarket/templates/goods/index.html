@@ -6,12 +6,12 @@
         <div class="am-header-left am-header-nav">
             <a href="city.html" class="" style="color: #fff;">
                 <img src="{% static 'images/city.png' %}"/>
-                <p style="font-size: 12px; margin-top: -35px;">南昌</p>
+                <p style="font-size: 12px; margin-top: -35px;" id="info">南昌</p>
             </a>
         </div>
         <h1 class="am-header-title1">
             <div class="search-box">
-                <a href="{% url 'search:haystack_search' %}" class="index-search">南昌大学前湖校区∨</a>
+                <a href="{% url 'search:haystack_search' %}" class="index-search">四川红富士</a>
 {#                <a href=""></a>#}
                 <!--  <input type="submit" value="" class="search-icon" /> -->
             </div>
@@ -79,7 +79,7 @@
         </li>
         <li>
             <div class="am-gallery-item">
-                <a href="{% url 'goods:商品分类列表'%}" class="">
+                <a href="{% url 'goods:商品分类列表' '' '' %} " class="">
                     <img src="{% static 'images/icon5.png' %}"/>
                     <p>超市</p>
                 </a>
@@ -236,6 +236,32 @@
             </li>
         </ul>
     </div>
+{% endblock %}
+{% block footer_js %}
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=3b1ff299946f069197c7883b33b418e0&plugin=AMap.CitySearch"></script>
+<script type="text/javascript">
+    //获取用户所在城市信息
+    function showCityInfo() {
+        //实例化城市查询类
+        var citysearch = new AMap.CitySearch();
+        //自动获取用户IP，返回当前城市
+        citysearch.getLocalCity(function(status, result) {
+            if (status === 'complete' && result.info === 'OK') {
+                if (result && result.city && result.bounds) {
+                    var cityinfo = result.city;
+                    var citybounds = result.bounds;
+                    document.getElementById('info').innerHTML = cityinfo;
+                    //地图显示当前城市
+                    map.setBounds(citybounds);
+                }
+            } else {
+                document.getElementById('info').innerHTML = result.info;
+            }
+        });
+    }
+    showCityInfo();
+</script>
+
 {% endblock %}
 
 

@@ -18,6 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from SpMarket import settings
+from goods.views import IndexView
 
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
@@ -31,4 +32,6 @@ urlpatterns = [
                   url(r'^goods/', include('goods.urls', namespace='goods')),
                   # 上传部件自动调用的上传地址
                   url(r'^ckeditor/', include("ckeditor_uploader.urls")),
+                  url(r'^$', IndexView.as_view()),
+
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -36,6 +36,12 @@ def check_login(func):  # 登录验证装饰器
     def verify_login(request, *args, **kwargs):
         # 验证session中是否有登录标识
         if request.session.get("ID") is None:
+            # 降上个请求地址保存到session
+            referer = request.META.get('HTTP_REFERER',None)
+            if referer:
+                request.session['referer'] = referer
+
+
             # 判断是否为ajax请求
             if request.is_ajax():
                 # 是ajax请求 提示

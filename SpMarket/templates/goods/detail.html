@@ -34,13 +34,13 @@
     <!--图片轮换-->
     <div class="am-slider am-slider-default" data-am-flexslider id="demo-slider-0">
         <ul class="am-slides">
-            <li><img src="{{ MEDIA_URL }}{{ data.logo }}"/></li>
+            <li><img src="{{ MEDIA_URL }}{{ goods_sku.logo }}"/></li>
             <li><img src="{% static 'images/pic.png' %}"/></li>
         </ul>
     </div>
     <div class="detal-info" style="position: relative; width: 100%;">
-        <p>{{ data.sku_name }}</p>
-        <h2>商城价：<span>{{ data.price }}</span></h2>
+        <p>{{ goods_sku.sku_name }}</p>
+        <h2>商城价：<span>{{ goods_sku.price }}</span></h2>
         <div class="heart">
             <img src="{% static 'images/herat.png' %}" width="25" id="imgflag" onclick="changeImage()"/>
             <p>收藏</p>
@@ -95,7 +95,7 @@
                 <ul class="comment-pic">
                     <li>
                         <div class="tit">
-                            <img src="images/tx.png" class="tx"/>
+                            <img src="{% static 'images/tx.png' %}" class="tx"/>
                             <span>songke2014</span>
                             <i> [2016-01-01]</i>
                         </div>
@@ -105,7 +105,7 @@
                     </li>
                     <li>
                         <div class="tit">
-                            <img src="images/tx.png" class="tx"/>
+                            <img src="{% static 'images/tx.png' %}" class="tx"/>
                             <span>songke2014</span>
                             <i> [2016-01-01]</i>
                         </div>
