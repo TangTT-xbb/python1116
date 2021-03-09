@@ -113,7 +113,7 @@
     <!--底部-->
     <div style="height: 55px;"></div>
     <div class="fix-bot">
-        <div class="fix-bot-cart"><i id="cart_count">{{ cart_count }}</i></div>
+        <div class="fix-bot-cart"><a href="{% url 'cart:购物车展示' %}"><i id="cart_count"> {{ cart_count }}</i></a></div>
         <a href="tureorder.html" class="list-js">去结算</a>
         <a href="tureorder.html" class="list-jsk">一键快购</a>
         <!--<div class="js-text">
