@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
-from cart.helper import json_msg, get_cart_key
+from cart.helper import json_msg, get_cart_key, get_cart_count
 from db.base_view import VerifyLoginView
 from goods.models import GoodsSKU
 from django_redis import get_redis_connection
@@ -116,7 +116,9 @@ class CartShowView(VerifyLoginView):
                 # 删除redis中过期的数据
                 r.hdel(cart_key, sku_id)
                 continue
-
+            if count <= 0:
+                r.hdel(cart_key, sku_id)
+                continue
             # 3. 将购物车中数量和商品信息合成一块儿(给一个已经存在的对象添加属性)
             goods_sku.count = count
             # setattr(goods_sku,'count',count)

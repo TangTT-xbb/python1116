@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from db.base_view import VerifyLoginView
-from user.forms import RegisterModelForm, LoginModelForm, ForgetpwdModelForm, UpdatepwdModelForm
+from user.forms import RegisterModelForm, LoginModelForm, ForgetpwdModelForm, UpdatepwdModelForm, AddressModelForm
 from user.helper import set_password, set_session, check_login, send_sms
 from user.models import SpUser
 from django_redis import get_redis_connection
@@ -240,3 +240,36 @@ class InfoView(VerifyLoginView):
         set_session(request, user)
         # 合成响应
         return redirect('user:个人中心')
+
+
+class AddressView(VerifyLoginView):
+    """收货地址添加"""
+
+    def get(self, request):
+        return render(request,'user/address.html')
+
+    def post(self, request):
+        # 接收数据
+        data = request.POST
+        form = AddressModelForm(data)
+        if form.is_valid():
+            return HttpResponse("数据合法")
+        user = request.session.get("ID")
+        username = data.username
+        phone = data.phone
+        brief = data.brief
+
+
+
+        # 操作数据
+        # 保存到数据库
+        # 合成响应跳转到地址列表页
+        return  HttpResponse("ok")
+class AddressListView(VerifyLoginView):
+    """收货地址列表"""
+
+    def get(self, request):
+        return render(request,'user/gladdress.html')
+
+    def post(self, request):
+        pass

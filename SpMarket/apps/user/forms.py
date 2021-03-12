@@ -3,7 +3,7 @@ import re
 from django import forms
 
 from user.helper import set_password
-from user.models import SpUser
+from user.models import SpUser, UserAddress
 from django_redis import get_redis_connection
 
 
@@ -74,7 +74,6 @@ class RegisterModelForm(forms.ModelForm):
                     raise forms.ValidationError({"verify_code": "验证码输入错误"})"""
 
         return self.cleaned_data
-
 
 
 class LoginModelForm(forms.ModelForm):
@@ -185,3 +184,33 @@ class UpdatepwdModelForm(forms.ModelForm):
             raise forms.ValidationError({"re_password": "两次密码输入不一致"})
 
         return self.cleaned_data
+
+
+class AddressModelForm(forms.ModelForm):
+    """用户添加收货地址的表单"""
+
+    class Meta:
+        model = UserAddress
+        exclude = ['create_time', 'update_time', 'is_delete', 'user']
+        error_messages = {
+            'username': {
+                'required': "请填写用户名！",
+            },
+            'phone': {
+                'required': "请填写手机号码！",
+            },
+            'brief': {
+                'required': "请填写详细地址！",
+            },
+            'harea': {
+                'required': "请填写完整地址！",
+            },
+        }
+    #
+    # def clean(self):
+    #     # 验证如果数据库里地址已经超过6条报错
+    #     cleaned_data = super().clean()
+    #     count = UserAddress.objects.filter(user_id=self.data.get("user_id")).count()
+    #     if count >= 6:
+    #         raise forms.ValidationError({"hcity": "收货地址最多只能保存6条"})
+    #     return cleaned_data
