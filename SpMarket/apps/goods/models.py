@@ -1,3 +1,8 @@
+from SpMarket import settings
+
+from django.utils.safestring import mark_safe
+
+
 from django.db import models
 
 # Create your models here.
@@ -85,6 +90,10 @@ class GoodsSKU(BaseModel):
     # 默认相册中的第一张图片作为封面照片
     logo = models.ImageField(verbose_name='封面照片',
                              upload_to='goods/%Y%m/%d')
+    def show_logo(self):
+        return mark_safe("<img style='width:50px' src='{}{}'/>".format(settings.MEDIA_URL,self.logo))
+    show_logo.short_description = "LOGO"
+    show_logo.allow_tags = True
     is_on_sale = models.BooleanField(verbose_name='商品是否上架',
                                      choices=is_on_sale_choices,
                                      default=False)
@@ -118,3 +127,22 @@ class Unit(BaseModel):
         db_table = "Unit"
         verbose_name = "商品单位"
         verbose_name_plural = verbose_name
+
+
+class Gallery(BaseModel):
+    """
+       商品相册
+    """
+    img_url = models.ImageField(verbose_name='相册图片地址',
+                                upload_to='goods_gallery/%Y%m/%d'
+                                )
+
+    goods_sku = models.ForeignKey(to="GoodsSKU", verbose_name="商品SKU",on_delete=models.DO_NOTHING)
+
+    class Meta:
+        db_table = "Gallery"
+        verbose_name = "商品相册管理"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return "商品相册:{}".format(self.img_url.name)

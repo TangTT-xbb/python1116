@@ -95,15 +95,31 @@
 {% endblock %}
 {% block content %}
     <form method="post" action="">
-    {% csrf_token %}
+        {% csrf_token %}
         <ul class="address">
             <li>
-                <span id="city" style="color:#d7d7d7;padding-left:5px;width: 305px;">省-市-区</span>
+                <span id="city" style="padding-left:5px;width: 305px;">省-市-区</span>
                 <i class="am-icon-angle-right" style="float: right; margin-top: 5px;"></i>
             </li>
-            <li><input type="text" name="brief" class="add-input" placeholder="详细地址"/></li>
-            <li><input type="text" name="username" class="add-input" placeholder="收货人"/></li>
-            <li><input type="text" name="phone" class="add-input" placeholder="手机号"/></li>
+            <p class="am-text-danger hcity">{{ form.errors.hcity.0 }}</p>
+            <li>
+                <input class="add-input" name="brief" type="text" value="{{ request.POST.brief }}"
+                       placeholder="详细地址"/>
+            </li>
+            <p class="am-text-danger brief">{{ form.errors.brief.0 }}</p>
+
+            <li>
+                <input type="text" name="username" class="add-input" value="{{ request.POST.username }}"
+                       placeholder="收货人"/>
+            </li>
+
+            <p class="am-text-danger username">{{ form.errors.username.0 }}</p>
+            <li>
+                <input type="text" name="phone" class="add-input" value="{{ request.POST.phone }}" placeholder="手机号"/>
+            </li>
+            <p class="am-text-danger phone">{{ form.errors.phone.0 }}</p>
+
+
         </ul>
         <div class="moren">
             <label class="am-checkbox am-warning">
@@ -111,7 +127,7 @@
             </label>
 
         </div>
-        <input type="submit" class="login-btn" value="确认提交">
+        <input type="button" class="login-btn address-btn" value="确认提交">
     </form>
 {% endblock %}
 
@@ -119,7 +135,39 @@
     <script type="text/javascript">
         $("#city").click(function (e) {
             SelCity(this, e);
-            console.log(this);
+            {#console.log(this);#}
+        });
+
+        $(function () {
+            $(".address-btn").on("click", function () {
+                //1. 准备数据
+                //获取表单中的有name属性的表单元素的数据
+                var data = $('form').serialize();
+                $.ajax({
+                    type: "post",
+                    url: "{% url 'user:添加收货地址' %}",
+                    data: data,
+                    dataType: "json",
+                    success: function (data) {
+                        {#console.debug(data);#}
+                        if (data.code == 0) {
+                            //跳转到列表
+                            location.href = "{% url 'user:收货地址列表' %}"
+                        } else {
+                            //清除所有的错误信息
+                            $(".am-text-danger").text('');
+                            //将错误信息显示到页面
+                            errors = data.data;
+                            {#console.debug(errors);#}
+                            for (var key in errors) {
+                                {#console.debug(key);#}
+                                {#console.debug(error   s[key][0])#}
+                                $("." + key).text(errors[key][0]);
+                            }
+                        }
+                    }
+                })
+            });
         });
     </script>
 {% endblock %}

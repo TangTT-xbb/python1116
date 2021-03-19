@@ -9,10 +9,11 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from cart.helper import json_msg
 from db.base_view import VerifyLoginView
 from user.forms import RegisterModelForm, LoginModelForm, ForgetpwdModelForm, UpdatepwdModelForm, AddressModelForm
 from user.helper import set_password, set_session, check_login, send_sms
-from user.models import SpUser
+from user.models import SpUser, UserAddress
 from django_redis import get_redis_connection
 
 
@@ -246,30 +247,46 @@ class AddressView(VerifyLoginView):
     """收货地址添加"""
 
     def get(self, request):
-        return render(request,'user/address.html')
+        return render(request, 'user/address.html')
 
     def post(self, request):
         # 接收数据
-        data = request.POST
+        data = request.POST.dict()  # 强制转换成字典
+
+        # 字典保存用户
+        data['user_id'] = request.session.get("ID")
+
+        # 表单验证数据合法性
         form = AddressModelForm(data)
         if form.is_valid():
-            return HttpResponse("数据合法")
-        user = request.session.get("ID")
-        username = data.username
-        phone = data.phone
-        brief = data.brief
-
-
+            form.instance.user_id = SpUser.objects.get(pk=data['user_id'])
+            form.save()
+            # return redirect('user:收货地址列表')
+            return JsonResponse(json_msg(0, '添加成功'))
+        else:
+            context = {
+                'form': form
+            }
+            # return render(request, 'user/address.html', context=context)
+            return JsonResponse(json_msg(1, "添加失败", data=form.errors))
 
         # 操作数据
         # 保存到数据库
         # 合成响应跳转到地址列表页
-        return  HttpResponse("ok")
+
+
 class AddressListView(VerifyLoginView):
     """收货地址列表"""
 
-    def get(self, request):
-        return render(request,'user/gladdress.html')
-
     def post(self, request):
         pass
+
+    def get(self, request):
+        # 接收参数
+        user_id = request.session.get("ID")
+        addresses = UserAddress.objects.filter(user_id=user_id, is_delete=False).order_by("-isDefault")
+        context = {
+            'addresses': addresses
+        }
+
+        return render(request, 'user/address_list.html', context=context)

@@ -202,15 +202,20 @@ class AddressModelForm(forms.ModelForm):
             'brief': {
                 'required': "请填写详细地址！",
             },
-            'harea': {
+            'hcity': {
                 'required': "请填写完整地址！",
             },
         }
-    #
-    # def clean(self):
-    #     # 验证如果数据库里地址已经超过6条报错
-    #     cleaned_data = super().clean()
-    #     count = UserAddress.objects.filter(user_id=self.data.get("user_id")).count()
-    #     if count >= 6:
-    #         raise forms.ValidationError({"hcity": "收货地址最多只能保存6条"})
-    #     return cleaned_data
+
+    def clean(self):
+        # 验证如果数据库里地址已经超过6条报错
+        cleaned_data = super().clean()
+        count = UserAddress.objects.filter(user_id=self.data.get("user_id")).count()
+        if count >= 6:
+            raise forms.ValidationError({"hcity": "收货地址最多只能保存6条"})
+
+            # 操作默认值
+            # 如果当前是默认地址,其他 就设置为False
+        if cleaned_data.get('isDefault'):
+            UserAddress.objects.filter(user_id=self.data.get("user_id")).update(isDefault=False)
+        return cleaned_data
