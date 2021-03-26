@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block content %}
-
+    <form method="post" action="">
+    {% csrf_token %}
     {% if address is None %}
         <div style="height: 49px;"></div>
         <div class="add-address">
@@ -13,49 +14,56 @@
             <i class="am-icon-angle-right"></i>
         </div>
     {% else %}
-         <h5 class="order-tit">收货人信息</h5>
-    <div class="order-name">
-        <a href="gladdress.html">
-            <p class="order-tele">{{ address.username }}&emsp;{{ address.phone }}</p>
-            <p class="order-add">{{ address.hcity }}{{ address.hproper }}&emsp;{{ address.harea }}{{ address.brief }}</p>
-        </a>
-        <i class="am-icon-angle-right"></i>
-    </div>
-
+        <h5 class="order-tit">收货人信息</h5>
+        <div class="order-name">
+            <a href="{% url 'user:收货地址列表' %}">
+                <p class="order-tele">{{ address.username }}&emsp;{{ address.phone }}</p>
+                <p class="order-add">
+                    {{ address.hcity }}{{ address.hproper }}&emsp;{{ address.harea }}{{ address.brief }}</p>
+            </a>
+            <i class="am-icon-angle-right"></i>
+        </div>
+        <input type="hidden" name="address" value="{{ address.pk }}"/>
     {% endif %}
 
     <div style="background: #eee; height: 10px;"></div>
     <ul class="shopcart-list" style="padding-bottom: 0;">
-        <li>
-            <img src="{% static 'images/test3.png' %}" class="shop-pic"/>
-            <div class="order-mid">
-                <div class="tit">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</div>
-                <div class="order-price">￥169 <i>X2</i></div>
-            </div>
-        </li>
-        <li>
-            <img src="{% static 'images/test3.png' %}" class="shop-pic"/>
-            <div class="order-mid">
-                <div class="tit">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</div>
-                <div class="order-price">￥169 <i>X2</i></div>
-            </div>
-        </li>
+        {% for goods_sku in goods_skus %}
+            <li>
+                <img src="{{ MEDIA_URL }}{{ goods_sku.logo }}" class="shop-pic"/>
+                <div class="order-mid">
+                    <div class="tit">{{ goods_sku.goods_spu }}&emsp;{{ goods_sku.sku_name }}</div>
+                    <div class="order-price">￥{{ goods_sku.price }} <i>X{{ goods_sku.count }}</i></div>
+                </div>
+                <input type="hidden" name="sku_ids" value="{{ goods_sku.pk }}">
+            </li>
+        {% endfor %}
+
+
     </ul>
     <ul class="order-infor">
         <li class="order-infor-first">
             <span>商品总计：</span>
-            <i>￥88.00</i>
+            <i id="goods_total_price" price="{{ goods_total_price }}">￥{{ goods_total_price }}</i>
         </li>
         <li class="order-infor-first">
-            <span>运费：</span>
-            <i>包邮</i>
+            <span>运输方式：</span>
+
+            <i><select name="transport" id="transport">
+                {% for transport in transports %}
+                    <option value="{{ transport.id }}" price="{{ transport.price }}">
+                        {{ transport.name }}&emsp;¥{{ transport.price }}</option>
+                {% endfor %}
+
+
+            </select></i>
         </li>
-        <li class="order-infor-first">
-            <a href="">积分抵费></a>
-        </li>
-        <li class="order-infor-first">
-            <a href="">选择优惠券></a>
-        </li>
+        {#        <li class="order-infor-first">#}
+        {#            <a href="">积分抵费></a>#}
+        {#        </li>#}
+        {#        <li class="order-infor-first">#}
+        {#            <a href="">选择优惠券></a>#}
+        {#        </li>#}
     </ul>
     <div style="background: #eee; height: 10px;"></div>
     <textarea placeholder="备注说明" class="bz-infor"></textarea>
@@ -63,10 +71,12 @@
     <div style="height: 55px;"></div>
     <div class="shop-fix">
         <div class="order-text">
-            应付总额：<span>￥188</span>
+            应付总额：<span>￥<i id="total_price">0.00</i> </span>
         </div>
-        <a href="order.html" class="js-btn">提交订单</a>
+        <a href="javascript:;" class="js-btn">提交订单</a>
     </div>
+
+</form>
 {% endblock %}
 
 {% block footer %}
@@ -75,6 +85,59 @@
 
 {% endblock %}
 
- 
- 
+{% block footer_js %}
+    <script>
+        $(function () {
+            // 计算应付总金额
+            function totalPrice() {
+                // 获取商品的总金额
+                var goods_total_price = $('#goods_total_price').attr('price');
+                console.debug(goods_total_price);
+                // 获取运费
+                var transport_price = $("#transport").find(":selected").attr('price');
+                console.debug(transport_price);
+                // 订单总金额
+                var total_price = parseFloat(goods_total_price) + parseFloat(transport_price);
+                console.debug(total_price);
+                $("#total_price").text(total_price.toFixed(2));
+
+            };
+
+            totalPrice();
+
+            //绑定修改事件
+            $("#transport").on("change", function(){
+                //重新计算价格
+                totalPrice();
+            });
+
+
+        // 绑定点击事件 用来提交订单数据
+            $('.js-btn').on("click",function () {
+                {#console.debug(111);#}
+                //准备数据
+                var data = $("form").serialize();
+                $.ajax({
+                    type:"post",
+                    url:"{% url 'order:确认订单' %}",
+                    data:data,
+                    dataType:"json",
+                    success:function (data) {
+                        if(data.code == 0 ){
+                            // 跳转到确认支付页面
+                            location.href = "{% url 'order:确认支付' %}?order_sn="+data.data;
+                        }else{
+                            alert(data.errmsg);
+                        }
+                    }
+
+
+                })
+                //
+            })
+        })
+
+    </script>
+{% endblock %}
+
 
