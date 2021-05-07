@@ -16,6 +16,7 @@ from user.helper import set_password, set_session, check_login, send_sms
 from user.models import SpUser, UserAddress
 from django_redis import get_redis_connection
 
+from django.views.decorators.csrf import csrf_exempt
 
 class RegisterView(View):
     """
@@ -242,6 +243,16 @@ class InfoView(VerifyLoginView):
         # 合成响应
         return redirect('user:个人中心')
 
+# 上传图片
+@csrf_exempt
+def uploadHeader(request):
+    file = request.FILES.get("file")
+    user_id = request.session.get("ID")
+    user = SpUser.objects.get(pk=user_id)
+    if file:
+        user.head = file
+        user.save()
+    return HttpResponse("ok")
 
 class AddressView(VerifyLoginView):
     """收货地址添加"""

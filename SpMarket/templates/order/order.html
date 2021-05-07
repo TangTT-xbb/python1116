@@ -20,37 +20,39 @@
     <h5 class="order-tit">收货人信息</h5>
     <div class="order-name">
         <a href="gladdress.html">
-            <p class="order-tele">宋科&nbsp;&nbsp;&nbsp;15180163170</p>
-            <p class="order-add">江西省南昌市 青云谱区解放西路258号</p>
+            <p class="order-tele">{{ order.username }}&emsp;{{ order.phone }}</p>
+            <p class="order-add">{{ order.address }}</p>
         </a>
         <i class="am-icon-angle-right"></i>
     </div>
     <div style="background: #eee; height: 10px;"></div>
     <h5 class="order-tit">确认订单信息</h5>
     <ul class="shopcart-list" style="padding-bottom: 0; margin-top: 0;">
-        <li>
-            <img src="images/test3.png" class="shop-pic"/>
-            <div class="order-mid">
-                <div class="tit">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</div>
-                <div class="order-price">￥169 <i>X2</i></div>
-            </div>
-        </li>
-        <li>
-            <img src="images/test3.png" class="shop-pic"/>
-            <div class="order-mid">
-                <div class="tit">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</div>
-                <div class="order-price">￥169 <i>X2</i></div>
-            </div>
-        </li>
+        {% for order_goods in order.ordergoods_set.all %}
+
+            <li>
+                <img src="{{ MEDIA_URL }}{{ order_goods.goods_sku.logo }}" class="shop-pic"/>
+                <div class="order-mid">
+                    <div class="tit">{{ order_goods.goods_sku.goods_spu }}&nbsp;&nbsp;{{ order_goods.goods_sku.sku_name }}</div>
+                    <div class="order-price">￥{{ order_goods.price }} <i>X{{ order_goods.count }}</i></div>
+                </div>
+            </li>
+        {% endfor %}
+
+
     </ul>
     <ul class="order-infor">
         <li class="order-infor-first">
             <span>商品总计：</span>
-            <i>￥88.00</i>
+            <i>￥{{ order.goods_total_price }}</i>
+        </li>
+        <li class="order-infor-first">
+            <span>运输方式：</span>
+            <i>{{ order.transport }}快递</i>
         </li>
         <li class="order-infor-first">
             <span>运费：</span>
-            <i>包邮</i>
+            <i>￥{{ order.transport_price }}</i>
         </li>
         <li class="order-infor-first">
             <a href="integral.html">积分抵费></a>
@@ -66,42 +68,35 @@
     <div style="background: #eee; height: 10px;"></div>
     <textarea placeholder="备注说明" class="bz-infor"></textarea>
     <div style="background: #eee; height: 10px;"></div>
-    <div style="height: 55px;"></div>
     <ul class="pay-style">
-        <li>
-            <img src="images/zhi.png" width="50"/>
-            <span>
-		   	 		<p>支付宝</p>
-		   	 		<p class="descript">推荐有支付宝账号的用户使用</p>
+        <form action="" method="post">
+        {% csrf_token %}
+            <input type="hidden" name="order_sn" value="{{ order.order_sn }}">
+            {% for payment in payments %}
+                <li>
+                    <img src="{{ MEDIA_URL }}{{ payment.logo }}" width="50"/>
+                    <span>
+		   	 		<p>{{ payment.name }}</p>
+		   	 		<p class="descript">{{ payment.brief }}</p>
 		   	 	</span>
-            <label class="am-radio-inline">
-                <input type="radio" checked="checked" name="radio10" value="1" data-am-ucheck>
-            </label>
-        </li>
-        <li>
-            <img src="images/wei.png" width="50"/>
-            <span>
-		   	 		<p>微信支付</p>
-		   	 		<p class="descript">推荐安装微信5.0及以上版本的使用</p>
-		   	 	</span>
-            <label class="am-radio-inline">
-                <input type="radio" name="radio10" value="1" data-am-ucheck>
-            </label>
-        </li>
-        <li>
-            <img src="images/ye.png" width="50"/>
-            <span>
-		   	 		<p>余额宝</p>
-		   	 		<p class="descript">账户余额支付</p>
-		   	 	</span>
-            <label class="am-radio-inline">
-                <input type="radio" name="radio10" value="1" data-am-ucheck>
-            </label>
-        </li>
+                    <label class="am-radio-inline">
+                        <input type="radio" {% if payment.is_tuijian %}
+                               checked="checked"
+                        {% endif %}
+                               name="payment" value="{{ payment.pk }}" data-am-ucheck>
+                    </label>
+                </li>
+
+            {% endfor %}</form>
+
+
     </ul>
+    <div style="background: #eee; height: 10px;"></div>
+    <div style="height: 55px;"></div>
+
     <div class="shop-fix">
         <div class="order-text">
-            应付总额：<span>￥188</span>
+            应付总额：<span>￥{{ order.order_total_price }}</span>
         </div>
         <a href="pay.html" class="js-btn">确认支付</a>
     </div>
@@ -111,7 +106,11 @@
 
 {% block footer %}
     <!--底部-->
-  {% include 'common/footer.html' %}
+    {% include 'common/footer.html' %}
 {% endblock %}
 
+{% block footer_js %}
+    <script>
 
+    </script>
+{% endblock %}

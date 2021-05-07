@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',  # 添加ckeditor富文本编辑器文件上传部件
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [ # 中间件
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'utils.TestMiddleware.TestMiddleware',# 注册 自己的中间键
 ]
 
 ROOT_URLCONF = 'SpMarket.urls'

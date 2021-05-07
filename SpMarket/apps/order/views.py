@@ -13,7 +13,7 @@ from django_redis import get_redis_connection
 from cart.helper import get_cart_key, json_msg
 from db.base_view import VerifyLoginView
 from goods.models import GoodsSKU
-from order.models import Transport, Order, OrderGoods
+from order.models import Transport, Order, OrderGoods, Payment
 from user.models import UserAddress, SpUser
 
 
@@ -122,8 +122,6 @@ class ConfirmOrderView(VerifyLoginView):
         # 创建保存点
         sid = transaction.savepoint()
 
-
-
         #  操作订单基本信息表
         order_sn = "{}{}{}".format(datetime.now().strftime("%Y%m%d%H%M%S"), user_id, random.randrange(10000, 99999))
         address_info = "{}{}{}-{}".format(address.hcity, address.hproper, address.harea, address.brief)
@@ -139,7 +137,7 @@ class ConfirmOrderView(VerifyLoginView):
 
             )
         except:
-            return JsonResponse(json_msg(8,"创建订单基本数据失败"))
+            return JsonResponse(json_msg(8, "创建订单基本数据失败"))
         # 操作订单商品表
         # 操作redis
         r = get_redis_connection()
@@ -147,7 +145,7 @@ class ConfirmOrderView(VerifyLoginView):
         goods_total_price = 0
         for sku_id in sku_ids:
             try:
-                goods_sku = GoodsSKU.objects.get(pk=sku_id, is_delete=False, is_on_sale=True)
+                goods_sku = GoodsSKU.objects.select_for_update().get(pk=sku_id, is_delete=False, is_on_sale=True)
             except GoodsSKU.DoesNotExist:
                 # 回滚数据
                 transaction.savepoint_rollback(sid)
@@ -176,6 +174,7 @@ class ConfirmOrderView(VerifyLoginView):
             goods_total_price += count * goods_sku.price
 
             # 扣除库存 销量增加
+            # GoodsSKU.objects.filter(pk=sku_id,stock=goods_sku.stock).update(stock=goods_sku.stock-count)
             goods_sku.stock -= count
             goods_sku.sale_num += count
             goods_sku.save()
@@ -189,18 +188,15 @@ class ConfirmOrderView(VerifyLoginView):
         except:
             # 回滚
             transaction.savepoint_rollback(sid)
-            return JsonResponse(json_msg(9,"更新订单失败"))
+            return JsonResponse(json_msg(9, "更新订单失败"))
 
         # 清空redis中的购物车数据(对应sku_id的)
         r.hdel(cart_key, *sku_ids)
 
-
         # 下单成功，提交事务
         transaction.savepoint_commit(sid)
         # 3. 合成响应
-        return JsonResponse(json_msg(0, "创建订单成功",data=order_sn))
-
-
+        return JsonResponse(json_msg(0, "创建订单成功", data=order_sn))
 
         # return render(request, 'order/tureorder.html')
 
@@ -209,4 +205,29 @@ class ShowOrder(VerifyLoginView):
     """确认支付页面"""
 
     def get(self, request):
-        return render(request, 'order/order.html')
+        # 接收参数
+        order_sn = request.GET.get('order_sn')
+        # 操作数据
+        user_id = request.session.get('ID')
+
+        order = Order.objects.get(order_sn=order_sn, user_id=user_id)
+        payments = Payment.objects.filter(is_delete=False).order_by()
+        # 渲染 数据
+        context = {
+            'order': order,
+            'payments': payments,
+        }
+        return render(request, 'order/order.html', context=context)
+
+    def post(self, request):
+        # 接入支付
+        pass
+
+
+class Pay(VerifyLoginView):
+    """展示支付结果"""
+    def get(self, request):
+        return render(request,"order/pay.html")
+
+    def post(self, request):
+        pass

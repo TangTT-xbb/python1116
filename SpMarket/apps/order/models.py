@@ -84,6 +84,7 @@ class Payment(BaseModel):
     name = models.CharField(max_length=50, verbose_name='支付方式')
     brief = models.CharField(max_length=200, verbose_name='说明', null=True)
     logo = models.ImageField(upload_to="payment", verbose_name='支付LOGO')
+    is_tuijian = models.BooleanField(default=False,verbose_name='是否推荐')
 
     def __str__(self):
         return self.name

@@ -4,6 +4,14 @@
 
 {% block head_css %}
     <link href="{% static 'css/check.css' %}" rel="stylesheet" type="text/css"/>
+    <!--引入CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'webuploader/webuploader.css' %}">
+
+    <!--引入JS-->
+    <script type="text/javascript" src="{% static 'webuploader/webuploader.js' %}"></script>
+
+    <!--SWF在初始化的时候指定，在后面将展示-->
+
 {% endblock %}
 
 {% block header_data %}
@@ -13,15 +21,17 @@
 {% block content %}
     <form action="" method="post" enctype="multipart/form-data">
         <ul class="safty1">
-
             {% csrf_token %}
             <li>
-
                 <i style="margin-top: 25px;">头像</i>
                 <div class="infor-pic">
                     {#                    <img src="{% static 'images/infortx.png' %}"/>#}
-                    <img src="{{ MEDIA_URL }}{{ user.head }}"/>
+                    <img id="myhead" src="{{ MEDIA_URL }}{{ user.head }}"/>
                 </div>
+            </li>
+            <li>
+                <div id="fileList" class="uploader-list"></div>
+                <div id="filePicker">选择图片</div>
             </li>
             <li>
                 <input type="file" name="head">
@@ -82,11 +92,62 @@
     <script type="application/javascript">
         var gender = {{ user.gender }};
         if (gender == 1) {
-            $('input[type="radio"][value="1"]').prop("checked",true);
+            $('input[type="radio"][value="1"]').prop("checked", true);
         } else {
-            $('input[type="radio"][value="2"]').prop("checked",true);
+            $('input[type="radio"][value="2"]').prop("checked", true);
         }
 
+        $(function () {
+            // 初始化Web Uploader
+            var uploader = WebUploader.create({
+
+                // 选完文件后，是否自动上传。
+                auto: true,
+
+                // swf文件路径
+                swf: '{% static "webuploader/Uploader.swf" %}',
+
+                // 文件接收服务端。
+                server: '{% url "user:上传图片" %}',
+
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#filePicker',
+
+                // 只允许选择图片文件。
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                }
+            });
+            // 当有文件添加进来的时候
+            uploader.on('fileQueued', function (file) {
+                {#var $li = $(#}
+                {#    '<div id="' + file.id + '" class="file-item thumbnail">' +#}
+                {#    '<img>' +#}
+                {#    '<div class="info">' + file.name + '</div>' +#}
+                {#    '</div>'#}
+                {#    ),#}
+                {#    $img = $li.find('img');#}
+                {##}
+                {##}
+                {#// $list为容器jQuery实例#}
+                {#$list.append($li);#}
+
+                // 创建缩略图
+                // 如果为非图片文件，可以不用调用此方法。
+                // thumbnailWidth x thumbnailHeight 为 100 x 100
+                uploader.makeThumb(file, function (error, src) {
+                    if (error) {
+                        $("#myhead").replaceWith('<span>不能预览</span>');
+                        return;
+                    }
+
+                    $("#myhead").attr('src', src);
+                }, 100, 100);
+            });
+        })
 
     </script>
 
